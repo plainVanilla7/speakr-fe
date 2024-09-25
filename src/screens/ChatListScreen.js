@@ -10,17 +10,19 @@ import { useSelector } from "react-redux";
 import Avatar from "../components/Avatar";
 
 export default function ChatListScreen({ navigation }) {
-  const chats = [
-    { id: "John Doe", user: "John Doe", lastMessage: "Ceva de fumat?" },
-    { id: "Jane Doe", user: "Jane Doe", lastMessage: "Good morning!" },
-    {
-      id: "Mike Roll",
-      user: "Mike Roll",
-      lastMessage: ":))",
-    },
-    { id: "Emma Rock", user: "Emma Rock", lastMessage: "Hi! How are you?" },
-    { id: "Sophia State", user: "Sophia State", lastMessage: "10 ciumidele" },
-  ];
+  // Get conversations from Redux store
+  const conversations = useSelector((state) => state.chat.conversations);
+
+  // Transform conversations object into an array suitable for FlatList
+  const chats = Object.keys(conversations).map((username) => {
+    const messages = conversations[username];
+    const lastMessage = messages[messages.length - 1].text; // Get last message from conversation
+    return {
+      id: username,
+      user: username,
+      lastMessage: lastMessage,
+    };
+  });
 
   const renderItem = ({ item }) => (
     <TouchableOpacity

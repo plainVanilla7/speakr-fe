@@ -4,17 +4,21 @@ import { useDispatch } from "react-redux";
 import { sendMessage } from "../redux/chatSlice";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function ChatInput() {
+export default function ChatInput({ username }) {
   const [message, setMessage] = useState("");
+
   const dispatch = useDispatch();
 
   const handleSend = () => {
     if (message.trim()) {
       dispatch(
         sendMessage({
-          text: message,
-          sender: "You",
-          timestamp: new Date().toLocaleTimeString(),
+          username, // Pass the username
+          message: {
+            text: message,
+            sender: "You",
+            timestamp: new Date().toLocaleTimeString(),
+          },
         }),
       );
       setMessage("");

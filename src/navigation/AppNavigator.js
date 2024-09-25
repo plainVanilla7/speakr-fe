@@ -50,7 +50,7 @@ export default function AppNavigator() {
           component={ChatScreen}
           options={({ route }) => ({
             title: `${route.params.username}`,
-            headerStyle: { backgroundColor: "#6200ee" },
+            headerStyle: { backgroundColor: "black" },
             headerTintColor: "#fff",
           })}
         />
@@ -61,7 +61,7 @@ export default function AppNavigator() {
           component={ProfileScreen}
           options={{
             title: "Profile",
-            headerStyle: { backgroundColor: "#6200ee" },
+            headerStyle: { backgroundColor: "black" },
             headerTintColor: "#fff",
           }}
         />

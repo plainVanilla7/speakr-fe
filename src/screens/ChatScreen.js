@@ -60,6 +60,8 @@ export default function ChatScreen({ route }) {
         keyExtractor={(item, index) => index.toString()}
         inverted
       />
+
+      <View style={styles.chatInput}></View>
       <ChatInput username={username} />
     </View>
   );
@@ -75,6 +77,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     alignItems: "flex-end",
   },
+  chatInput: {},
   bubble: {
     padding: 10,
     borderRadius: 15,

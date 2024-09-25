@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginLeft: 10,
+    marginHorizontal: 10,
   },
   messageText: {
     color: "#fff",

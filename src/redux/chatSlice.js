@@ -38,6 +38,16 @@ const chatSlice = createSlice({
       }
       state.conversations[username].push(message);
     },
+
+    deleteConversation: (state, action) => {
+      const { username } = action.payload;
+      delete state.conversations[username];
+    },
+
+    deleteMessage: (state, action) => {
+      const { username, index } = action.payload;
+      state.conversations[username].splice(index, 1);
+    },
   },
 });
 

@@ -13,7 +13,7 @@ export default function ChatInput({ username }) {
     if (message.trim()) {
       dispatch(
         sendMessage({
-          username, // Pass the username
+          username,
           message: {
             text: message,
             sender: "You",

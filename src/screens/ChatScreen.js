@@ -2,20 +2,35 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, FlatList, StyleSheet, Image } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import ChatInput from "../components/ChatInput"; // Assuming you have a ChatInput component
-import { sendMessage } from "../redux/chatSlice";
+import { sendMessage, markConversationAsRead } from "../redux/chatSlice"; // Import the action
 
 export default function ChatScreen({ route }) {
   const { username } = route.params; // Get the username from route params
-  const conversations = useSelector(
-    (state) => state.chat.conversations[username] || [],
+
+  const dispatch = useDispatch(); // Get the dispatch function
+
+  // Access the conversation object
+  const conversation = useSelector(
+    (state) => state.chat.conversations[username],
   );
+
+  // Extract messages from the conversation object
+  const messages = conversation ? conversation.messages : [];
+
   const flatListRef = useRef(null);
+
+  // Dispatch the action to mark the conversation as read when the component mounts
+  useEffect(() => {
+    if (conversation) {
+      dispatch(markConversationAsRead({ username }));
+    }
+  }, [dispatch, username, conversation]);
 
   useEffect(() => {
     if (flatListRef.current) {
       flatListRef.current.scrollToOffset({ offset: 0, animated: true });
     }
-  }, [conversations]);
+  }, [messages]);
 
   const renderItem = ({ item }) => {
     const isSentByUser = item.sender === "You";
@@ -55,7 +70,7 @@ export default function ChatScreen({ route }) {
     <View style={styles.container}>
       <FlatList
         ref={flatListRef}
-        data={conversations}
+        data={messages}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         inverted
@@ -66,7 +81,6 @@ export default function ChatScreen({ route }) {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

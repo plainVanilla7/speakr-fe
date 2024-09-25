@@ -10,20 +10,22 @@ import { useSelector } from "react-redux";
 import Avatar from "../components/Avatar";
 
 export default function ChatListScreen({ navigation }) {
-  // Get conversations from Redux store
   const conversations = useSelector((state) => state.chat.conversations);
-
-  // Transform conversations object into an array suitable for FlatList
   const chats = Object.keys(conversations).map((username) => {
-    const messages = conversations[username];
-    const lastMessage = messages[messages.length - 1].text; // Get last message from conversation
+    const conversation = conversations[username];
+    const messages = conversation.messages || [];
+    const lastMessage =
+      messages.length > 0 ? messages[messages.length - 1].text : "";
+    const hasUnreadMessages =
+      conversation.lastReadMessageIndex < messages.length - 1;
+
     return {
       id: username,
       user: username,
       lastMessage: lastMessage,
+      hasUnreadMessages: hasUnreadMessages,
     };
   });
-
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.chatItem}
@@ -31,9 +33,17 @@ export default function ChatListScreen({ navigation }) {
     >
       <Avatar name={item.user} size={40} />
       <View style={styles.chatDetails}>
-        <Text style={styles.userName}>{item.user}</Text>
+        <Text
+          style={[
+            styles.userName,
+            item.hasUnreadMessages && styles.unreadUserName,
+          ]}
+        >
+          {item.user}
+        </Text>
         <Text style={styles.lastMessage}>{item.lastMessage}</Text>
       </View>
+      {item.hasUnreadMessages && <View style={styles.unreadDot} />}
     </TouchableOpacity>
   );
 
@@ -48,11 +58,20 @@ export default function ChatListScreen({ navigation }) {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+  },
+  unreadUserName: {
+    fontWeight: "bold",
+  },
+  unreadDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "blue",
+    marginLeft: "auto",
   },
   chatItem: {
     flexDirection: "row",

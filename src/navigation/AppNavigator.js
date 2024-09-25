@@ -29,7 +29,6 @@ export default function AppNavigator() {
           options={{ title: "Create Account" }}
         />
 
-        {/* Add Avatar to the Inbox (ChatList) header */}
         <Stack.Screen
           name="Inbox"
           component={ChatListScreen}

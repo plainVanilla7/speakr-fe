@@ -5,7 +5,7 @@ import ChatInput from "../components/ChatInput";
 
 export default function ChatScreen() {
   const messages = useSelector((state) => state.chat.messages);
-  const currentUser = "You"; // Assume the current user's identifier
+  const currentUser = "You";
 
   const renderItem = ({ item }) => {
     const isSentByUser = item.sender === currentUser;
@@ -17,13 +17,6 @@ export default function ChatScreen() {
           isSentByUser ? styles.messageRight : styles.messageLeft,
         ]}
       >
-        {/* Show avatar only for received messages */}
-        {!isSentByUser && (
-          <Image
-            source={{ uri: "https://example.com/avatar.png" }} // Replace with actual avatar URL
-            style={styles.avatar}
-          />
-        )}
         <View
           style={[
             styles.bubble,
@@ -33,6 +26,18 @@ export default function ChatScreen() {
           <Text style={styles.messageText}>{item.text}</Text>
           <Text style={styles.timestamp}>{item.timestamp}</Text>
         </View>
+
+        {isSentByUser ? (
+          <Image
+            source={{ uri: "https://randomuser.me/api/portraits/men/1.jpg" }}
+            style={styles.avatarRight}
+          />
+        ) : (
+          <Image
+            source={{ uri: "https://randomuser.me/api/portraits/women/1.jpg" }}
+            style={styles.avatarLeft}
+          />
+        )}
       </View>
     );
   };
@@ -44,7 +49,7 @@ export default function ChatScreen() {
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         style={styles.messageList}
-        inverted // Ensures the latest message is at the bottom
+        inverted
       />
       <ChatInput />
     </View>
@@ -64,11 +69,17 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     marginVertical: 5,
   },
-  avatar: {
+  avatarLeft: {
     width: 40,
     height: 40,
     borderRadius: 20,
     marginRight: 10,
+  },
+  avatarRight: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginLeft: 10,
   },
   bubble: {
     padding: 10,
@@ -80,13 +91,15 @@ const styles = StyleSheet.create({
   },
   bubbleRight: {
     backgroundColor: "#6200ee",
-    marginLeft: "auto",
   },
   messageLeft: {
     justifyContent: "flex-start",
+    alignItems: "center",
   },
   messageRight: {
     justifyContent: "flex-end",
+    flexDirection: "row",
+    alignItems: "center",
   },
   messageText: {
     color: "#fff",

@@ -4,7 +4,7 @@
     "slug": "grindr-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app_icon_sec.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",

@@ -1,25 +1,22 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, FlatList, StyleSheet, Image } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import ChatInput from "../components/ChatInput"; // Assuming you have a ChatInput component
-import { sendMessage, markConversationAsRead } from "../redux/chatSlice"; // Import the action
+import ChatInput from "../components/ChatInput";
+import { markConversationAsRead } from "../redux/chatSlice"; // Import the action
 
 export default function ChatScreen({ route }) {
-  const { username } = route.params; // Get the username from route params
+  const { username } = route.params;
 
-  const dispatch = useDispatch(); // Get the dispatch function
+  const dispatch = useDispatch();
 
-  // Access the conversation object
   const conversation = useSelector(
     (state) => state.chat.conversations[username],
   );
 
-  // Extract messages from the conversation object
   const messages = conversation ? conversation.messages : [];
 
   const flatListRef = useRef(null);
 
-  // Dispatch the action to mark the conversation as read when the component mounts
   useEffect(() => {
     if (conversation) {
       dispatch(markConversationAsRead({ username }));
@@ -76,8 +73,9 @@ export default function ChatScreen({ route }) {
         inverted
       />
 
-      <View style={styles.chatInput}></View>
-      <ChatInput username={username} />
+      <View style={styles.chatInput}>
+        <ChatInput username={username} />
+      </View>
     </View>
   );
 }
@@ -91,7 +89,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     alignItems: "flex-end",
   },
-  chatInput: {},
+  chatInput: { marginBottom: "2%" },
   bubble: {
     padding: 10,
     borderRadius: 15,

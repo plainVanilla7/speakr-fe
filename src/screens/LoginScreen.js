@@ -14,7 +14,7 @@ export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-
+  const drawable = require("../../assets/app_icon_sec.png");
   const handleLogin = () => {
     dispatch(login({ username }));
     navigation.navigate("Inbox");
@@ -22,12 +22,7 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={{
-          uri: "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png",
-        }}
-        style={styles.logo}
-      />
+      <Image source={drawable} style={styles.logo} />
       <TextInput
         style={styles.input}
         placeholder="Phone number, username or email"
@@ -75,8 +70,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 250,
+    height: 250,
     marginBottom: 30,
   },
   input: {

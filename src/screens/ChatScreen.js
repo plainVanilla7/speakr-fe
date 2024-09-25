@@ -1,22 +1,35 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { View, Text, FlatList, StyleSheet, Image } from "react-native";
-import { useSelector } from "react-redux";
-import ChatInput from "../components/ChatInput";
+import { useSelector, useDispatch } from "react-redux";
+import ChatInput from "../components/ChatInput"; // Assuming you have a ChatInput component
+import { sendMessage } from "../redux/chatSlice";
 
-export default function ChatScreen() {
-  const messages = useSelector((state) => state.chat.messages);
-  const currentUser = "You";
+export default function ChatScreen({ route }) {
+  const { username } = route.params; // Get the username from route params
+  const conversations = useSelector(
+    (state) => state.chat.conversations[username] || [],
+  );
+  const flatListRef = useRef(null);
+
+  useEffect(() => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+    }
+  }, [conversations]);
 
   const renderItem = ({ item }) => {
-    const isSentByUser = item.sender === currentUser;
+    const isSentByUser = item.sender === "You";
 
     return (
-      <View
-        style={[
-          styles.messageContainer,
-          isSentByUser ? styles.messageRight : styles.messageLeft,
-        ]}
-      >
+      <View style={[styles.messageContainer]}>
+        {!isSentByUser && (
+          <Image
+            source={{
+              uri: "https://randomuser.me/api/portraits/women/2.jpg",
+            }}
+            style={isSentByUser ? styles.avatarRight : styles.avatarLeft}
+          />
+        )}
         <View
           style={[
             styles.bubble,
@@ -26,16 +39,12 @@ export default function ChatScreen() {
           <Text style={styles.messageText}>{item.text}</Text>
           <Text style={styles.timestamp}>{item.timestamp}</Text>
         </View>
-
-        {isSentByUser ? (
+        {isSentByUser && (
           <Image
-            source={{ uri: "https://randomuser.me/api/portraits/men/1.jpg" }}
-            style={styles.avatarRight}
-          />
-        ) : (
-          <Image
-            source={{ uri: "https://randomuser.me/api/portraits/women/1.jpg" }}
-            style={styles.avatarLeft}
+            source={{
+              uri: "https://randomuser.me/api/portraits/men/1.jpg",
+            }}
+            style={isSentByUser ? styles.avatarRight : styles.avatarLeft}
           />
         )}
       </View>
@@ -45,13 +54,13 @@ export default function ChatScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={messages}
+        ref={flatListRef}
+        data={conversations}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
-        style={styles.messageList}
         inverted
       />
-      <ChatInput />
+      <ChatInput username={username} />
     </View>
   );
 }
@@ -61,25 +70,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  messageList: {
-    padding: 10,
-  },
   messageContainer: {
     flexDirection: "row",
-    alignItems: "flex-end",
     marginVertical: 5,
-  },
-  avatarLeft: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  avatarRight: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginLeft: 10,
+    alignItems: "flex-end",
   },
   bubble: {
     padding: 10,
@@ -87,26 +81,31 @@ const styles = StyleSheet.create({
     maxWidth: "70%",
   },
   bubbleLeft: {
-    backgroundColor: "#EAEAEA",
+    backgroundColor: "#53d769",
   },
   bubbleRight: {
-    backgroundColor: "#6200ee",
+    backgroundColor: "#147efb",
+    marginLeft: "auto",
   },
-  messageLeft: {
-    justifyContent: "flex-start",
-    alignItems: "center",
+  avatarLeft: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginHorizontal: 10,
   },
-  messageRight: {
-    justifyContent: "flex-end",
-    flexDirection: "row",
-    alignItems: "center",
+  avatarRight: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginLeft: 10,
   },
   messageText: {
     color: "#fff",
+    fontSize: 16,
   },
   timestamp: {
-    fontSize: 10,
-    color: "#ccc",
+    fontSize: 12,
+    color: "#fff",
     textAlign: "right",
     marginTop: 5,
   },

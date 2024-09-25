@@ -15,7 +15,6 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
-        {/* Customize Header for Login */}
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -46,12 +45,11 @@ export default function AppNavigator() {
           })}
         />
 
-        {/* Custom Header for Chat Screen */}
         <Stack.Screen
           name="Chat"
           component={ChatScreen}
           options={({ route }) => ({
-            title: `Chat with ${route.params.userId}`,
+            title: `${route.params.username}`,
             headerStyle: { backgroundColor: "#6200ee" },
             headerTintColor: "#fff",
           })}

@@ -1,3 +1,5 @@
+// src/screens/ChatListScreen.js
+
 import React, { useEffect } from "react";
 import {
   View,
@@ -6,10 +8,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { loadConversations } from "../redux/chatSlice";
 import Avatar from "../components/Avatar";
+import Icon from "react-native-vector-icons/Ionicons";
 
 export default function ChatListScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -23,7 +27,7 @@ export default function ChatListScreen({ navigation }) {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#147efb" />
       </View>
     );
@@ -31,7 +35,7 @@ export default function ChatListScreen({ navigation }) {
 
   if (error) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loadingContainer}>
         <Text>Error: {error}</Text>
       </View>
     );
@@ -49,6 +53,7 @@ export default function ChatListScreen({ navigation }) {
       user: conversation.participantName,
       lastMessage: lastMessage,
       hasUnreadMessages: hasUnreadMessages,
+      avatar: conversation.participantAvatar, // Ensure this field is included in your data
     };
   });
 
@@ -57,7 +62,7 @@ export default function ChatListScreen({ navigation }) {
       style={styles.chatItem}
       onPress={() => navigation.navigate("Chat", { conversationId: item.id })}
     >
-      <Avatar name={item.user} size={40} />
+      <Avatar uri={item.avatar} size={60} />
       <View style={styles.chatDetails}>
         <Text
           style={[
@@ -67,7 +72,9 @@ export default function ChatListScreen({ navigation }) {
         >
           {item.user}
         </Text>
-        <Text style={styles.lastMessage}>{item.lastMessage}</Text>
+        <Text style={styles.lastMessage} numberOfLines={1}>
+          {item.lastMessage}
+        </Text>
       </View>
       {item.hasUnreadMessages && <View style={styles.unreadDot} />}
     </TouchableOpacity>
@@ -75,47 +82,131 @@ export default function ChatListScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Direct</Text>
+        <View style={styles.headerIcons}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Contacts")}
+            style={styles.headerIcon}
+          >
+            <Icon name="ios-person-add-outline" size={28} color="#000" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("NewMessage")}
+            style={styles.headerIcon}
+          >
+            <Icon name="ios-create-outline" size={28} color="#000" />
+          </TouchableOpacity>
+        </View>
+      </View>
+      {/* Chat List */}
       <FlatList
         data={chats}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
-        ListEmptyComponent={<Text>No chats available.</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Your Messages</Text>
+            <Text style={styles.emptySubText}>
+              Send private photos and messages to a friend or group.
+            </Text>
+          </View>
+        }
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  // Container styles
   container: {
     flex: 1,
-    padding: 10,
+    backgroundColor: "#fff",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  // Header styles
+  header: {
+    height: 60,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  headerIcons: {
+    flexDirection: "row",
+    position: "absolute",
+    right: 15,
+  },
+  headerIcon: {
+    marginLeft: 15,
+  },
+  // Chat item styles
+  chatItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  chatDetails: {
+    marginLeft: 15,
+    flex: 1,
+    justifyContent: "center",
+  },
+  userName: {
+    fontSize: 16,
+    color: "#000",
   },
   unreadUserName: {
     fontWeight: "bold",
+  },
+  lastMessage: {
+    color: "#999",
+    fontSize: 14,
+    marginTop: 2,
   },
   unreadDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "blue",
+    backgroundColor: "#147efb",
     marginLeft: "auto",
   },
-  chatItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  chatDetails: {
-    marginLeft: 10,
+  // Empty component styles
+  emptyContainer: {
     flex: 1,
+    alignItems: "center",
+    marginTop: 100,
   },
-  userName: {
-    fontSize: 18,
+  emptyImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+    resizeMode: "contain",
+  },
+  emptyText: {
+    fontSize: 22,
     fontWeight: "bold",
+    color: "#000",
   },
-  lastMessage: {
-    color: "#888",
+  emptySubText: {
+    fontSize: 16,
+    color: "#999",
+    textAlign: "center",
+    marginHorizontal: 30,
+    marginTop: 10,
   },
 });

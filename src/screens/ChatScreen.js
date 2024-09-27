@@ -1,157 +1,171 @@
-import React, { useEffect, useRef } from "react";
+// src/screens/ChatScreen.js
+
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   FlatList,
+  TextInput,
+  TouchableOpacity,
   StyleSheet,
-  Image,
-  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
-import { useSelector, useDispatch } from "react-redux";
-import ChatInput from "../components/ChatInput";
-import { loadMessages, markConversationAsRead } from "../redux/chatSlice";
+import { useSelector } from "react-redux";
+import { sendMessageApi } from "../api/messagesApi";
+import { createConversationApi } from "../api/conversationsApi";
+import MessageBubble from "../components/MessageBubble";
+import Icon from "react-native-vector-icons/Ionicons";
 
-export default function ChatScreen({ route }) {
-  const { conversationId } = route.params;
-
-  const dispatch = useDispatch();
-
-  const conversation = useSelector(
-    (state) => state.chat.conversations[conversationId],
-  );
-  const messages = conversation ? conversation.messages : [];
-  const loading = useSelector((state) => state.chat.loading);
-  const error = useSelector((state) => state.chat.error);
-
-  const flatListRef = useRef(null);
+export default function ChatScreen({ route, navigation }) {
+  const { conversationId, recipientId } = route.params;
+  const [conversation, setConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState("");
+  const authToken = useSelector((state) => state.auth.authToken);
 
   useEffect(() => {
-    dispatch(loadMessages(conversationId));
-  }, [dispatch, conversationId]);
-
-  useEffect(() => {
-    if (conversation) {
-      dispatch(markConversationAsRead({ conversationId }));
+    if (conversationId) {
+      // Existing conversation
+      fetchConversation(conversationId);
+    } else if (recipientId) {
+      // Create a new conversation
+      createConversation(recipientId);
     }
-  }, [dispatch, conversationId, conversation]);
+  }, [conversationId, recipientId]);
 
-  useEffect(() => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+  const fetchConversation = async (id) => {
+    try {
+      // Fetch conversation details
+      const data = await getConversationApi(authToken, id);
+      setConversation(data);
+      // Fetch messages
+      const messagesData = await getMessagesApi(authToken, id);
+      setMessages(messagesData);
+    } catch (error) {
+      console.error("Error fetching conversation:", error);
     }
-  }, [messages]);
-
-  const renderItem = ({ item }) => {
-    const isSentByUser = item.senderId === conversation.currentUserId;
-
-    return (
-      <View style={styles.messageContainer}>
-        {!isSentByUser && (
-          <Image
-            source={{
-              uri: item.senderAvatarUrl || "https://via.placeholder.com/40",
-            }}
-            style={styles.avatarLeft}
-          />
-        )}
-        <View
-          style={[
-            styles.bubble,
-            isSentByUser ? styles.bubbleRight : styles.bubbleLeft,
-          ]}
-        >
-          <Text style={styles.messageText}>{item.text}</Text>
-          <Text style={styles.timestamp}>
-            {new Date(item.timestamp).toLocaleTimeString()}
-          </Text>
-        </View>
-        {isSentByUser && (
-          <Image
-            source={{
-              uri: item.senderAvatarUrl || "https://via.placeholder.com/40",
-            }}
-            style={styles.avatarRight}
-          />
-        )}
-      </View>
-    );
   };
 
-  if (loading && messages.length === 0) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#147efb" />
-      </View>
-    );
-  }
+  const createConversation = async (recipientId) => {
+    try {
+      const data = await createConversationApi(authToken, recipientId);
+      setConversation(data);
+      // Fetch messages if any
+      const messagesData = await getMessagesApi(authToken, data._id);
+      setMessages(messagesData);
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+    }
+  };
 
-  if (error && messages.length === 0) {
-    return (
-      <View style={styles.container}>
-        <Text>Error: {error}</Text>
-      </View>
-    );
-  }
+  const sendMessage = async () => {
+    if (!inputText.trim()) return;
+
+    try {
+      const messageData = await sendMessageApi(
+        authToken,
+        conversation._id,
+        inputText,
+      );
+      setMessages([...messages, messageData]);
+      setInputText("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
+  const renderItem = ({ item }) => <MessageBubble message={item} />;
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        inverted
-      />
-      <View style={styles.chatInput}>
-        <ChatInput conversationId={conversationId} />
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+    >
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Icon name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          {conversation && conversation.participantName}
+        </Text>
       </View>
-    </View>
+      {/* Messages */}
+      <FlatList
+        data={messages}
+        keyExtractor={(item) => item._id}
+        renderItem={renderItem}
+        style={styles.messagesList}
+        contentContainerStyle={{ padding: 10 }}
+      />
+      {/* Input */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Message..."
+          value={inputText}
+          onChangeText={setInputText}
+        />
+        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+          <Icon name="send" size={24} color="#147efb" />
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  // Header styles
+  header: {
+    height: 60,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  backButton: {
+    position: "absolute",
+    left: 15,
+  },
+  // Messages list
+  messagesList: {
+    flex: 1,
     backgroundColor: "#fff",
   },
-  messageContainer: {
+  // Input styles
+  inputContainer: {
     flexDirection: "row",
-    marginVertical: 5,
-    alignItems: "flex-end",
-  },
-  chatInput: { marginBottom: "2%" },
-  bubble: {
     padding: 10,
-    borderRadius: 15,
-    maxWidth: "70%",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
   },
-  bubbleLeft: {
-    backgroundColor: "#53d769",
-  },
-  bubbleRight: {
-    backgroundColor: "#147efb",
-    marginLeft: "auto",
-  },
-  avatarLeft: {
-    width: 40,
+  input: {
+    flex: 1,
     height: 40,
+    backgroundColor: "#fff",
     borderRadius: 20,
-    marginHorizontal: 10,
+    paddingHorizontal: 15,
+    borderWidth: 1,
+    borderColor: "#ddd",
   },
-  avatarRight: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginHorizontal: 10,
-  },
-  messageText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  timestamp: {
-    fontSize: 12,
-    color: "#fff",
-    textAlign: "right",
-    marginTop: 5,
+  sendButton: {
+    marginLeft: 10,
   },
 });

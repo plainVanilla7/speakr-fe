@@ -25,7 +25,7 @@ export default function LoginScreen({ navigation }) {
       <Image source={drawable} style={styles.logo} />
       <TextInput
         style={styles.input}
-        placeholder="Phone number, username or email"
+        placeholder="Username"
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"

@@ -1,2 +1,2 @@
-export const API_BASE_URL = "https://<YOUR_SERVER_URL>:<PORT>/api";
-export const SOCKET_SERVER_URL = "https://<YOUR_SERVER_URL>:<PORT>";
+export const API_BASE_URL = "http://192.168.1.250:5000/api";
+export const SOCKET_SERVER_URL = "http://192.168.1.250:5000/api";

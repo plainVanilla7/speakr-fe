@@ -1,10 +1,14 @@
+// src/api/authApi.js
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
-const API_URL = "https://<YOUR_SERVER_URL>:<PORT>/api/auth";
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+});
 
-export const login = async (username, password) => {
+export const loginApi = async (username, password) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, {
+    const response = await apiClient.post("/auth/login", {
       username,
       password,
     });
@@ -14,13 +18,11 @@ export const login = async (username, password) => {
   }
 };
 
-export const register = async (userData) => {
+export const registerApi = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/register`, userData);
+    const response = await apiClient.post("/auth/register", userData);
     return response.data;
   } catch (error) {
     throw error;
   }
 };
-
-// Add more auth-related API calls as needed

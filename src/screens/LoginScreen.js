@@ -1,3 +1,4 @@
+// src/screens/LoginScreen.js
 import React, { useState } from "react";
 import {
   View,
@@ -6,18 +7,33 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/authSlice";
+import { loginApi } from "../api/auth";
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const drawable = require("../../assets/app_icon_sec.png");
-  const handleLogin = () => {
-    dispatch(login({ username }));
-    navigation.navigate("Inbox");
+
+  const handleLogin = async () => {
+    try {
+      const data = await loginApi(username, password);
+
+      dispatch(login({ user: data.user, authToken: data.authToken }));
+
+      navigation.navigate("Inbox");
+    } catch (error) {
+      console.error("Login error:", error);
+
+      Alert.alert(
+        "Login Error",
+        error.response?.data?.message || "An error occurred during login.",
+      );
+    }
   };
 
   return (
@@ -29,6 +45,7 @@ export default function LoginScreen({ navigation }) {
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
+        autoCorrect={false}
       />
       <TextInput
         style={styles.input}
@@ -62,6 +79,7 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  // Your existing styles
   container: {
     flex: 1,
     justifyContent: "center",

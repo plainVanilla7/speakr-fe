@@ -1,41 +1,41 @@
-import React, { useState } from "react";
-import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+// src/components/ChatInput.js
+import React, { useState, useContext } from "react";
+import { View, TextInput, Button, StyleSheet } from "react-native";
 import { useDispatch } from "react-redux";
-import { sendMessage } from "../redux/chatSlice";
-import { MaterialIcons } from "@expo/vector-icons";
+import { sendMessageThunk } from "../redux/chatSlice";
+import { SocketContext } from "../context/SocketContext";
 
-export default function ChatInput({ username }) {
-  const [message, setMessage] = useState("");
-
+export default function ChatInput({ conversationId }) {
+  const [messageText, setMessageText] = useState("");
   const dispatch = useDispatch();
+  const socket = useContext(SocketContext);
 
   const handleSend = () => {
-    if (message.trim()) {
-      dispatch(
-        sendMessage({
-          username,
-          message: {
-            text: message,
-            sender: "You",
-            timestamp: new Date().toLocaleTimeString(),
-          },
-        }),
-      );
-      setMessage("");
+    if (messageText.trim()) {
+      const message = {
+        text: messageText,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Emit the message via Socket.IO
+      socket.emit("sendMessage", { conversationId, message: message.text });
+
+      // Dispatch the thunk to send the message via API and update the store
+      dispatch(sendMessageThunk({ conversationId, message: message.text }));
+
+      setMessageText("");
     }
   };
 
   return (
     <View style={styles.container}>
       <TextInput
+        value={messageText}
+        onChangeText={setMessageText}
+        placeholder="Type a message"
         style={styles.input}
-        placeholder="Type a message..."
-        value={message}
-        onChangeText={setMessage}
       />
-      <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-        <MaterialIcons name="send" size={24} color="#6200ee" />
-      </TouchableOpacity>
+      <Button title="Send" onPress={handleSend} />
     </View>
   );
 }
@@ -43,20 +43,14 @@ export default function ChatInput({ username }) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#EAEAEA",
-    alignItems: "center",
+    padding: 5,
   },
   input: {
     flex: 1,
-    backgroundColor: "#F0F0F0",
+    borderColor: "#ccc",
+    borderWidth: 1,
     borderRadius: 25,
-    paddingVertical: 8,
     paddingHorizontal: 15,
-    fontSize: 16,
-  },
-  sendButton: {
-    marginLeft: 10,
+    marginRight: 10,
   },
 });

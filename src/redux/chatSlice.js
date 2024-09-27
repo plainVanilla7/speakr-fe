@@ -1,10 +1,6 @@
 // src/redux/chatSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  fetchConversations,
-  fetchMessages,
-  sendMessageApi,
-} from "../api/chatApi";
+import { fetchConversations, fetchMessages, sendMessageApi } from "../api/chat";
 
 // Thunk to load conversations
 export const loadConversations = createAsyncThunk(

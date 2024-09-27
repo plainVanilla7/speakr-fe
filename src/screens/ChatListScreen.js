@@ -1,18 +1,43 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { loadConversations } from "../redux/chatSlice";
 import Avatar from "../components/Avatar";
 
 export default function ChatListScreen({ navigation }) {
+  const dispatch = useDispatch();
   const conversations = useSelector((state) => state.chat.conversations);
-  const chats = Object.keys(conversations).map((username) => {
-    const conversation = conversations[username];
+  const loading = useSelector((state) => state.chat.loading);
+  const error = useSelector((state) => state.chat.error);
+
+  useEffect(() => {
+    dispatch(loadConversations());
+  }, [dispatch]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#147efb" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text>Error: {error}</Text>
+      </View>
+    );
+  }
+
+  const chats = Object.values(conversations).map((conversation) => {
     const messages = conversation.messages || [];
     const lastMessage =
       messages.length > 0 ? messages[messages.length - 1].text : "";
@@ -20,16 +45,17 @@ export default function ChatListScreen({ navigation }) {
       conversation.lastReadMessageIndex < messages.length - 1;
 
     return {
-      id: username,
-      user: username,
+      id: conversation.id,
+      user: conversation.participantName,
       lastMessage: lastMessage,
       hasUnreadMessages: hasUnreadMessages,
     };
   });
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.chatItem}
-      onPress={() => navigation.navigate("Chat", { username: item.id })}
+      onPress={() => navigation.navigate("Chat", { conversationId: item.id })}
     >
       <Avatar name={item.user} size={40} />
       <View style={styles.chatDetails}>
@@ -51,13 +77,14 @@ export default function ChatListScreen({ navigation }) {
     <View style={styles.container}>
       <FlatList
         data={chats}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         ListEmptyComponent={<Text>No chats available.</Text>}
       />
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -82,6 +109,7 @@ const styles = StyleSheet.create({
   },
   chatDetails: {
     marginLeft: 10,
+    flex: 1,
   },
   userName: {
     fontSize: 18,

@@ -1,4 +1,5 @@
 // src/screens/LoginScreen.js
+
 import React, { useState } from "react";
 import {
   View,
@@ -7,6 +8,7 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/authSlice";
@@ -16,6 +18,7 @@ export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // State variable for error messages
+  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
   const dispatch = useDispatch();
   const drawable = require("../../assets/app_icon_sec.png");
 
@@ -26,12 +29,13 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
+    setIsLoading(true); // Start loading indicator
     try {
       // Call the login API with the username and password
       const data = await loginApi(username, password);
 
-      // Assuming the response data contains 'user' and 'authToken'
-      dispatch(login({ user: data.user, authToken: data.authToken }));
+      // Assuming the response data contains 'user' and 'token'
+      dispatch(login({ user: data.user, authToken: data.token }));
 
       // Navigate to the Inbox screen
       navigation.navigate("Inbox");
@@ -42,13 +46,14 @@ export default function LoginScreen({ navigation }) {
       const errorMessage =
         error.response?.data?.message || "An error occurred during login.";
       setError(errorMessage);
+    } finally {
+      setIsLoading(false); // Stop loading indicator
     }
   };
 
   return (
     <View style={styles.container}>
       <Image source={drawable} style={styles.logo} />
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -70,8 +75,17 @@ export default function LoginScreen({ navigation }) {
         }}
         secureTextEntry
       />
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginText}>Log In</Text>
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      <TouchableOpacity
+        style={styles.loginButton}
+        onPress={handleLogin}
+        disabled={isLoading} // Disable button when loading
+      >
+        {isLoading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.loginText}>Log In</Text>
+        )}
       </TouchableOpacity>
       <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
       <View style={styles.divider}>

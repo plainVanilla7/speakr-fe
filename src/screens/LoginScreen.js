@@ -7,7 +7,6 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  Alert,
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/authSlice";
@@ -16,34 +15,48 @@ import { loginApi } from "../api/auth";
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // State variable for error messages
   const dispatch = useDispatch();
   const drawable = require("../../assets/app_icon_sec.png");
 
   const handleLogin = async () => {
+    // Input validation
+    if (!username || !password) {
+      setError("Please enter both username and password.");
+      return;
+    }
+
     try {
+      // Call the login API with the username and password
       const data = await loginApi(username, password);
 
+      // Assuming the response data contains 'user' and 'authToken'
       dispatch(login({ user: data.user, authToken: data.authToken }));
 
+      // Navigate to the Inbox screen
       navigation.navigate("Inbox");
     } catch (error) {
       console.error("Login error:", error);
 
-      Alert.alert(
-        "Login Error",
-        error.response?.data?.message || "An error occurred during login.",
-      );
+      // Extract error message from the response or use a default message
+      const errorMessage =
+        error.response?.data?.message || "An error occurred during login.";
+      setError(errorMessage);
     }
   };
 
   return (
     <View style={styles.container}>
       <Image source={drawable} style={styles.logo} />
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <TextInput
         style={styles.input}
         placeholder="Username"
         value={username}
-        onChangeText={setUsername}
+        onChangeText={(text) => {
+          setUsername(text);
+          if (error) setError(""); // Clear error when user starts typing
+        }}
         autoCapitalize="none"
         autoCorrect={false}
       />
@@ -51,7 +64,10 @@ export default function LoginScreen({ navigation }) {
         style={styles.input}
         placeholder="Password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => {
+          setPassword(text);
+          if (error) setError(""); // Clear error when user starts typing
+        }}
         secureTextEntry
       />
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
@@ -91,6 +107,11 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     marginBottom: 30,
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+    textAlign: "center",
   },
   input: {
     width: "100%",

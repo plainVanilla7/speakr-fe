@@ -6,6 +6,7 @@ import RegisterScreen from "../screens/RegisterScreen";
 import ChatScreen from "../screens/ChatScreen";
 import ChatListScreen from "../screens/ChatListScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import ContactsScreen from "../screens/ContactsScreen";
 import Avatar from "../components/Avatar";
 import { TouchableOpacity, View } from "react-native";
 
@@ -20,14 +21,12 @@ export default function AppNavigator() {
           component={LoginScreen}
           options={{ headerShown: false }}
         />
-
         {/*Register*/}
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
           options={{ title: "Create Account" }}
         />
-
         <Stack.Screen
           name="Inbox"
           component={ChatListScreen}
@@ -44,7 +43,6 @@ export default function AppNavigator() {
             headerTintColor: "#fff",
           })}
         />
-
         <Stack.Screen
           name="Chat"
           component={ChatScreen}
@@ -54,13 +52,21 @@ export default function AppNavigator() {
             headerTintColor: "#fff",
           })}
         />
-
         {/* Profile Screen Header */}
         <Stack.Screen
           name="Profile"
           component={ProfileScreen}
           options={{
             title: "Profile",
+            headerStyle: { backgroundColor: "black" },
+            headerTintColor: "#fff",
+          }}
+        />
+        <Stack.Screen
+          name="Contacts"
+          component={ContactsScreen}
+          options={{
+            title: "Contacts",
             headerStyle: { backgroundColor: "black" },
             headerTintColor: "#fff",
           }}

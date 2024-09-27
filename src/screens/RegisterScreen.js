@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useDispatch } from "react-redux";
-import { registerApi } from "../api/authApi";
+import { registerApi } from "../api/auth";
 import { login } from "../redux/authSlice";
 
 export default function RegisterScreen({ navigation }) {

@@ -7,6 +7,7 @@ import ChatScreen from "../screens/ChatScreen";
 import ChatListScreen from "../screens/ChatListScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import ContactsScreen from "../screens/ContactsScreen";
+import NewMessageScreen from "../screens/NewMessageScreen";
 import Avatar from "../components/Avatar";
 import { TouchableOpacity, View } from "react-native";
 
@@ -67,6 +68,15 @@ export default function AppNavigator() {
           component={ContactsScreen}
           options={{
             title: "Contacts",
+            headerStyle: { backgroundColor: "black" },
+            headerTintColor: "#fff",
+          }}
+        />
+        <Stack.Screen
+          name="NewMessage"
+          component={NewMessageScreen}
+          options={{
+            title: "NewMessage",
             headerStyle: { backgroundColor: "black" },
             headerTintColor: "#fff",
           }}

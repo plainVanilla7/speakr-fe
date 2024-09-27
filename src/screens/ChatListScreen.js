@@ -8,13 +8,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Image,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { loadConversations } from "../redux/chatSlice";
 import Avatar from "../components/Avatar";
-import Icon from "react-native-vector-icons/Ionicons";
-
+import Icon from "react-native-vector-icons/FontAwesome"; // Updated Icon import
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 export default function ChatListScreen({ navigation }) {
   const dispatch = useDispatch();
   const conversations = useSelector((state) => state.chat.conversations);
@@ -53,7 +52,7 @@ export default function ChatListScreen({ navigation }) {
       user: conversation.participantName,
       lastMessage: lastMessage,
       hasUnreadMessages: hasUnreadMessages,
-      avatar: conversation.participantAvatar, // Ensure this field is included in your data
+      avatar: conversation.participantAvatar,
     };
   });
 
@@ -82,7 +81,6 @@ export default function ChatListScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Direct</Text>
         <View style={styles.headerIcons}>
@@ -90,17 +88,20 @@ export default function ChatListScreen({ navigation }) {
             onPress={() => navigation.navigate("Contacts")}
             style={styles.headerIcon}
           >
-            <Icon name="ios-person-add-outline" size={28} color="#000" />
+            <MaterialCommunityIcons
+              name="access-point"
+              size={24}
+              color="black"
+            />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("NewMessage")}
             style={styles.headerIcon}
           >
-            <Icon name="ios-create-outline" size={28} color="#000" />
+            <MaterialCommunityIcons name="send" size={24} color="black" />
           </TouchableOpacity>
         </View>
       </View>
-      {/* Chat List */}
       <FlatList
         data={chats}
         keyExtractor={(item) => item.id.toString()}
@@ -137,9 +138,9 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ddd",
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
   },
   headerTitle: {
-    flex: 1,
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
     right: 15,
   },
   headerIcon: {
-    marginLeft: 15,
+    marginLeft: 20,
   },
   // Chat item styles
   chatItem: {
@@ -190,6 +191,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     marginTop: 100,
+    paddingHorizontal: 20,
   },
   emptyImage: {
     width: 150,
@@ -206,7 +208,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#999",
     textAlign: "center",
-    marginHorizontal: 30,
     marginTop: 10,
   },
 });

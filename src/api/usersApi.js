@@ -7,6 +7,7 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
+// Fetch contacts
 export const getContactsApi = async (authToken) => {
   try {
     const response = await apiClient.get("/users/contacts", {
@@ -20,6 +21,7 @@ export const getContactsApi = async (authToken) => {
   }
 };
 
+// Add a new contact
 export const addContactApi = async (authToken, contactId) => {
   try {
     const response = await apiClient.post(
@@ -37,6 +39,7 @@ export const addContactApi = async (authToken, contactId) => {
   }
 };
 
+// Search users
 export const searchUsersApi = async (authToken, query) => {
   try {
     const response = await apiClient.get("/users/search", {

@@ -18,8 +18,8 @@ export default function RegisterScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState(""); // State variable for error messages
-  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const drawable = require("../../assets/app_icon_sec.png");
 
@@ -37,18 +37,14 @@ export default function RegisterScreen({ navigation }) {
 
     setIsLoading(true); // Start loading indicator
     try {
-      // Call the register API with the username and password
       const data = await registerApi(username, password);
 
-      // Assuming the response data contains 'user' and 'token'
       dispatch(login({ user: data.user, authToken: data.token }));
 
-      // Navigate to the Inbox screen or Home screen
       navigation.navigate("Inbox");
     } catch (error) {
       console.error("Registration error:", error);
 
-      // Extract error message from the response or use a default message
       const errorMessage =
         error.response?.data?.message ||
         "An error occurred during registration.";
@@ -96,7 +92,7 @@ export default function RegisterScreen({ navigation }) {
       <TouchableOpacity
         style={styles.registerButton}
         onPress={handleRegister}
-        disabled={isLoading} // Disable button when loading
+        disabled={isLoading}
       >
         {isLoading ? (
           <ActivityIndicator size="small" color="#fff" />
@@ -118,7 +114,6 @@ export default function RegisterScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  // Styles similar to LoginScreen, adjusted for RegisterScreen
   container: {
     flex: 1,
     justifyContent: "center",
@@ -149,7 +144,7 @@ const styles = StyleSheet.create({
   registerButton: {
     width: "100%",
     height: 50,
-    backgroundColor: "#4CAF50", // A different color to distinguish from login
+    backgroundColor: "#4CAF50",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,

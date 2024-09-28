@@ -1,4 +1,3 @@
-// src/redux/chatSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchConversations, fetchMessages, sendMessageApi } from "../api/chat";
 
@@ -8,7 +7,10 @@ export const loadConversations = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const data = await fetchConversations();
-      return data; // Assuming data is an array of conversations
+      return data.map((conversation) => ({
+        ...conversation,
+        id: conversation._id || conversation.id, // Ensure correct mapping of id
+      }));
     } catch (error) {
       return rejectWithValue(
         error.response ? error.response.data : error.message,

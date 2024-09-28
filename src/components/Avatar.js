@@ -2,12 +2,17 @@ import React from "react";
 import { Avatar as PaperAvatar } from "react-native-paper";
 import { StyleSheet } from "react-native";
 
-export default function Avatar({ name, size = 50, onPress }) {
+export default function Avatar({ name = "", size = 50, onPress }) {
   const getInitials = (name) => {
+    if (!name || typeof name !== "string") {
+      return "";
+    }
+
     const initials = name
       .split(" ")
       .map((word) => word[0])
       .join("");
+
     return initials.toUpperCase();
   };
 

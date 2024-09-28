@@ -33,15 +33,7 @@ export default function AppNavigator() {
           component={ChatListScreen}
           options={({ navigation }) => ({
             title: "Your Chats",
-            headerRight: () => (
-              <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-                <View style={{ marginRight: 15 }}>
-                  <Avatar name="User Name" size={40} />
-                </View>
-              </TouchableOpacity>
-            ),
-            headerStyle: { backgroundColor: "black" },
-            headerTintColor: "#fff",
+            headerShown: false,
           })}
         />
         <Stack.Screen
@@ -68,17 +60,14 @@ export default function AppNavigator() {
           component={ContactsScreen}
           options={{
             title: "Contacts",
-            headerStyle: { backgroundColor: "black" },
-            headerTintColor: "#fff",
+              headerShown: false,
           }}
         />
         <Stack.Screen
           name="NewMessage"
           component={NewMessageScreen}
           options={{
-            title: "NewMessage",
-            headerStyle: { backgroundColor: "black" },
-            headerTintColor: "#fff",
+            headerShown: false,
           }}
         />
       </Stack.Navigator>

@@ -12,7 +12,6 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { loadConversations } from "../redux/chatSlice";
 import Avatar from "../components/Avatar";
-import Icon from "react-native-vector-icons/FontAwesome"; // Updated Icon import
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 export default function ChatListScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -40,21 +39,28 @@ export default function ChatListScreen({ navigation }) {
     );
   }
 
-  const chats = Object.values(conversations).map((conversation) => {
-    const messages = conversation.messages || [];
-    const lastMessage =
-      messages.length > 0 ? messages[messages.length - 1].text : "";
-    const hasUnreadMessages =
-      conversation.lastReadMessageIndex < messages.length - 1;
+  const chats = Object.values(conversations)
+    .map((conversation) => {
+      const messages = conversation.messages || [];
+      const lastMessage =
+        messages.length > 0 ? messages[messages.length - 1].text : "";
+      const hasUnreadMessages =
+        conversation.lastReadMessageIndex < messages.length - 1;
 
-    return {
-      id: conversation.id,
-      user: conversation.participantName,
-      lastMessage: lastMessage,
-      hasUnreadMessages: hasUnreadMessages,
-      avatar: conversation.participantAvatar,
-    };
-  });
+      if (!conversation.id) {
+        console.warn("Conversation is missing an id:", conversation);
+        return null; // Skip conversations without an id
+      }
+
+      return {
+        id: conversation.id, // Ensure id is present
+        user: conversation.participantName,
+        lastMessage: lastMessage,
+        hasUnreadMessages: hasUnreadMessages,
+        avatar: conversation.participantAvatar,
+      };
+    })
+    .filter(Boolean); // Filter out null values
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -88,11 +94,7 @@ export default function ChatListScreen({ navigation }) {
             onPress={() => navigation.navigate("Contacts")}
             style={styles.headerIcon}
           >
-            <MaterialCommunityIcons
-              name="access-point"
-              size={24}
-              color="black"
-            />
+            <MaterialCommunityIcons name="contacts" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("NewMessage")}
@@ -100,6 +102,11 @@ export default function ChatListScreen({ navigation }) {
           >
             <MaterialCommunityIcons name="send" size={24} color="black" />
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+          <View style={{ marginRight: 15 }}>
+            <Avatar name="User Name" size={30} />
+          </View>
+        </TouchableOpacity>
         </View>
       </View>
       <FlatList
@@ -120,7 +127,6 @@ export default function ChatListScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  // Container styles
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -130,7 +136,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  // Header styles
   header: {
     height: 60,
     paddingHorizontal: 15,
@@ -153,7 +158,6 @@ const styles = StyleSheet.create({
   headerIcon: {
     marginLeft: 20,
   },
-  // Chat item styles
   chatItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -186,7 +190,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#147efb",
     marginLeft: "auto",
   },
-  // Empty component styles
   emptyContainer: {
     flex: 1,
     alignItems: "center",

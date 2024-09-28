@@ -12,7 +12,7 @@ import {
   Platform,
 } from "react-native";
 import { useSelector } from "react-redux";
-import { sendMessageApi } from "../api/messagesApi";
+import { getMessagesApi, sendMessageApi } from "../api/messagesApi";
 import { createConversationApi } from "../api/conversationsApi";
 import MessageBubble from "../components/MessageBubble";
 import Icon from "react-native-vector-icons/Ionicons";
